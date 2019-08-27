@@ -1,1 +1,1 @@
-JAudioLibs AudioServers test translated from jaudiolibs/examples/SineAudioClient.java
+JAudioLibs AudioServers test translated from https://github.com/jaudiolibs/examples/blob/master/src/main/java/org/jaudiolibs/examples/SineAudioClient.java
