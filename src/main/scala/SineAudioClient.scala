@@ -89,7 +89,7 @@ object SineAudioClient extends App with AudioClient {
 
   /* Create a Thread to run our server. All servers require a Thread to run in.
    */
-  val runner = new Thread(new Runnable {
+  val runner = new Thread( new Runnable {
     def run = {
       // The server's run method can throw an Exception so we need to wrap it
       try {
@@ -99,66 +99,67 @@ object SineAudioClient extends App with AudioClient {
           Logger.getLogger(SineAudioClient.getClass.getName).log(Level.SEVERE, null, ex)
       }
     }
-  })
+  } )
+
   // set the Thread priority as high as possible.
   runner.setPriority(Thread.MAX_PRIORITY)
   // and start processing audio - you'll have to kill the program manually!
   runner.start
 
 
-// AudioClient implementation
+  // AudioClient implementation
 
-val FREQ = 440.0f
-var data: Array[Float] = _
-var buffer: Array[Float] = _
-var idx: Int = _
+  val FREQ = 440.0f
+  var data: Array[Float] = _
+  var buffer: Array[Float] = _
+  var idx: Int = _
 
-def configure(context: AudioConfiguration) = {
-  /* Check the configuration of the passed in context, and set up any
-   * necessary resources. Throw an Exception if the sample rate, buffer
-   * size, etc. cannot be handled. DO NOT assume that the context matches
-   * the configuration you passed in to create the server - it will
-   * be a best match.
-   */
-  if (context.getOutputChannelCount != 2) {
-    throw new IllegalArgumentException("SineAudioClient can only work with stereo output")
+  def configure(context: AudioConfiguration) = {
+    /* Check the configuration of the passed in context, and set up any
+     * necessary resources. Throw an Exception if the sample rate, buffer
+     * size, etc. cannot be handled. DO NOT assume that the context matches
+     * the configuration you passed in to create the server - it will
+     * be a best match.
+     */
+    if (context.getOutputChannelCount != 2) {
+      throw new IllegalArgumentException("SineAudioClient can only work with stereo output")
+    }
+
+    val size = (context.getSampleRate / FREQ).toInt
+    data = new Array[Float]( size )
+
+    for (i <- 0 until size) {
+        data(i) = (0.2 * math.sin(i.toDouble / size * math.Pi * 2)).toFloat
+    }
   }
-
-  val size = (context.getSampleRate / FREQ).toInt
-  data = new Array[Float]( size )
-
-  for (i <- 0 until size) {
-      data(i) = (0.2 * math.sin(i.toDouble / size * math.Pi * 2)).toFloat
-  }
-}
 
   def process(time: Long, inputs: java.util.List[FloatBuffer], outputs: java.util.List[FloatBuffer], nframes: Int) = {
-  // get left and right channels from array list
-  val left = outputs.get(0)
-  val right = outputs.get(1)
+    // get left and right channels from array list
+    val left = outputs.get(0)
+    val right = outputs.get(1)
 
-  if (buffer == null || buffer.length != nframes) {
-    buffer = new Array[Float]( nframes )
+    if (buffer == null || buffer.length != nframes) {
+      buffer = new Array[Float]( nframes )
+    }
+
+    // always use nframes as the number of samples to process
+    for (i <- 0 until nframes) {
+      buffer(i) = data(idx)
+      idx += 1
+      if (idx == data.length) {
+        idx = 0
+      }
+    }
+
+    left.put(buffer)
+    right.put(buffer)
+
+    true
   }
-
-  // always use nframes as the number of samples to process
-  for (i <- 0 until nframes) {
-    buffer(i) = data(idx)
-    idx += 1
-    if (idx == data.length) {
-    idx = 0
-  }
-}
-
-  left.put(buffer)
-  right.put(buffer)
-
-  true
-}
 
   def shutdown = {
-  //dispose resources.
-  data = null
-}
+    //dispose resources.
+    data = null
+  }
 
 }
