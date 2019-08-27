@@ -37,7 +37,7 @@ object SineAudioClient extends App with AudioClient {
          * It is also possible to create particular AudioServerProvider's
          * directly.
          */
-  val lib = "JavaSound" // or "JACK"
+  val lib = /*"JavaSound"*/ "JACK"
 
   var provider: AudioServerProvider = null
 
@@ -45,8 +45,6 @@ object SineAudioClient extends App with AudioClient {
 
   def findProvider: Unit =
     for (p <- loader.iterator.asScala) {
-      println( p.getLibraryName, p.getLibraryDescription )
-
       if (lib.equals(p.getLibraryName)) {
         provider = p
         return
@@ -58,6 +56,8 @@ object SineAudioClient extends App with AudioClient {
   if (provider == null) {
     throw new NullPointerException("No AudioServer found that matches : " + lib)
   }
+
+  println( s"using provider: ${provider.getLibraryName}" )
 
   /* Create an instance of our client - see methods in the implementation
    * below for more information.
