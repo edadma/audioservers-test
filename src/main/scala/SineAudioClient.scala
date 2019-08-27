@@ -9,7 +9,6 @@ import scala.jdk.CollectionConverters._
 
 import org.jaudiolibs.audioservers.AudioClient
 import org.jaudiolibs.audioservers.AudioConfiguration
-import org.jaudiolibs.audioservers.AudioServer
 import org.jaudiolibs.audioservers.AudioServerProvider
 import org.jaudiolibs.audioservers.ext.ClientID
 import org.jaudiolibs.audioservers.ext.Connections
@@ -57,7 +56,7 @@ object SineAudioClient extends App with AudioClient {
     throw new NullPointerException("No AudioServer found that matches : " + lib)
   }
 
-  println( s"using provider: ${provider.getLibraryName}" )
+  println( s"Using provider: ${provider.getLibraryName}" )
 
   /* Create an instance of our client - see methods in the implementation
    * below for more information.
